@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.111.3">
+  <title>Checkout example · Bootstrap v5.3</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <style>
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+    .nav-scroller .nav {
+      display: flex;
+      flex-wrap: nowrap;
+      padding-bottom: 1rem;
+      margin-top: -1px;
+      overflow-x: auto;
+      text-align: center;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+  <link href="/css/checkout.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+<div class="container">
+  <main>
+    <div class="py-5 text-center" onClick="location.href='/user/login'" style="cursor: pointer" >
+      <img class="d-block mx-auto mb-4" src="/img/bootstrap-logo.svg" alt="" width="72" height="57">
+      <h2>Join form</h2>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-md-7 col-lg-8" style="margin-left: 180px">
+        <form class="needs-validation" novalidate method="post" id="joinForm" onsubmit="return false;">
+          <div class="row g-3">
+            <div class="form-group row">
+              <div class="col-12">
+                <label for="userId" class="form-label">아이디</label>
+                <div class="input-group has-validation">
+                  <input type="text" class="form-control" id="userId" placeholder="ID" required/>
+                  <button id="idConfirmBtn" class="btn btn-outline-primary" style="border-radius: 5px; margin-left: 20px" onclick="idDuplicateCheck();">중복 확인</button>
+                  <div class="invalid-feedback">
+                    Your ID is required.
+                  </div>
+                  <div class="invalid-feedback" id="feedBackId" style="display: none">
+                    이미 존재하는 아이디 입니다.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="username" class="form-label">이름</label>
+              <div class="input-group has-validation">
+                <input type="text" class="form-control" id="userName" placeholder="Username" required>
+                <div class="invalid-feedback">
+                  Your username is required.
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="password" class="form-label">비밀번호</label>
+              <div class="input-group has-validation">
+                <input type="password" class="form-control" id="password" placeholder="Password" required>
+                <div class="invalid-feedback">
+                  Your password is required.
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="confirmPassword" class="form-label">비밀번호 재확인</label>
+              <div class="input-group has-validation">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                <div class="invalid-feedback">
+                  Your Confirm Password is required.
+                </div>
+                <div class="invalid-feedback" id="feedBack" style="display: none">
+                  비밀번호가 일치하지 않습니다.
+                </div>
+              </div>
+            </div>
+          </div>
+          <button id="joinBtn" class="w-100 btn btn-primary btn-lg" type="button" style="margin-top: 50px" onclick="frmSubmit();">Join</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1">&copy; 2017–2023 Company Name</p>
+  </footer>
+</div>
+
+
+<script src="/js/checkout.js"></script>
+</body>
+</html>
+<script>
+  let isCheckedId = false;
+
+  function idDuplicateCheck() {
+    const userId = document.getElementById('userId').value;
+    if(userId!='') {
+      $.ajax({
+        url : "/user/duplicate",
+        type : "get",
+        data : {
+          "userId" : userId
+        },
+        dataType: 'json',
+        async: false
+      }).done(function(data) {
+        console.log(data);
+        if(data.status == 'ok') {
+          isCheckedId = true;
+          alert("사용할수 있는 아이디 입니다.");
+        }else if(data.status == 'no') {
+          document.getElementById('feedBackId').style.display = 'block';
+          document.getElementById('userId').style.backgroundImage = "none";
+          document.getElementById('userId').style.borderColor = "red";
+        }else {
+          alert("알수없는 오류 발생 log 참조");
+        }
+              }).fail(function (request, status, error) {
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+      });
+    }else {
+      alert("아이디를 입력해 주세요.");
+    }
+  }
+
+  function frmSubmit() {
+    const password = $('#password').val();
+    const passwdConfirm = $('#confirmPassword').val();
+    const userName = $('#userName').val();
+    const userId = $('#userId').val();
+    const param = {
+      "loginId" : userId,
+      "name" : userName,
+      "password" : password
+    }
+    if(password != passwdConfirm) {
+      document.getElementById('feedBack').style.display = 'block';
+      document.getElementById('confirmPassword').style.backgroundImage = "none";
+      document.getElementById('confirmPassword').style.borderColor = "red";
+      return;
+    }else {
+      if(isCheckedId != true) {
+        alert("ID중복 체크 하십시오.");
+        return;
+      }
+      $.ajax({
+        url: '/user/insert',
+        type: 'post',
+        data: JSON.stringify(param),
+        dataType: 'json',
+        contentType : 'application/json'
+      }).done(function(data) {
+        if(data.result == 200) {
+          alert('회원가입이 완료되었습니다.');
+          location.href = "/user/login";
+        }else {
+          alert('회원가입이 실패했습니다.');
+          return false;
+        }
+      }).fail(function (request, status, error) {
+        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+      });
+    }
+  }
+
+</script>

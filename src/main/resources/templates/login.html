@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.111.3">
+  <title>Signin Template · Bootstrap v5.3</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <style>
+    @media (min-width: 768px) {
+
+    }
+
+    #joinBtn {
+      text-decoration: none;
+      color: black!important;
+    }
+    #joinBtn:hover {
+      text-decoration: underline;
+      color: black;
+    }
+  </style>
+  <link href="/css/sign-in.css" rel="stylesheet">
+</head>
+<body class="text-center">
+
+<main class="form-signin w-100 m-auto">
+
+  <form id="loginFrm" action="/user/proc" method="post">
+    <input type="hidden" id="securedUserId" name="securedUserId">
+    <input type="hidden" id="securedUserPassword" name="securedUserPassword">
+  </form>
+
+  <form id="rsaFrm">
+    <input type="hidden" id="rsaPublicKeyModule" name="rsaPublicKeyModule">
+    <input type="hidden" id="rsaPublicKeyExponent" name="rsaPublicKeyExponent">
+  </form>
+
+  <form class="needs-validation">
+    <img class="mb-4" src="/img/bootstrap-logo.svg" alt="" width="72" height="57" onclick="location.href='/user/login'" style="cursor: pointer">
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+    <div class="form-floating has-validation">
+      <input type="text" class="form-control" id="userId" placeholder="ID" required>
+      <label for="userId">ID</label>
+    </div>
+    <div class="form-floating has-validation">
+      <input type="password" class="form-control" id="userPassword" placeholder="Password" required>
+      <label for="userPassword">Password</label>
+      <div class="invalid-feedback" id="validateId">
+        아이디를 입력해 주세요.
+      </div>
+      <div class="invalid-feedback" id="validatePasswd">
+        비밀번호를 입력해 주세요.
+      </div>
+    </div>
+
+    <button class="w-100 btn btn-lg btn-primary" type="button" id="loginBtn" style="margin-top: 20px" onclick="login()">Sign in</button>
+    <div class="checkbox mb-3">
+      <div style="margin-top: 10px">
+        <a id="joinBtn" href="/user/join" style="margin-left: 230px;">회원가입</a>
+      </div>
+    </div>
+    <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2023</p>
+  </form>
+</main>
+</body>
+</html>
+
+<!--<script src="/js/login.js"></script>-->
+<script src="/security/jsbn.js"></script>
+<script src="/security/rsa.js"></script>
+<script src="/security/prng4.js"></script>
+<script src="/security/rng.js"></script>
+<script>
+
+  function validateCheck() {
+
+    if($('#userId').val()=='') {
+      document.getElementById('validateId').style.display = 'block';
+      return false;
+    }else {
+      document.getElementById('validateId').style.display = 'none';
+    }
+    if($('#userPassword').val()=='') {
+      document.getElementById('validatePasswd').style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+
+  function login() {
+    if(validateCheck()) {
+      getRSAKey();
+      securedData();
+      $('#loginFrm').submit();
+    }
+  }
+
+  function getRSAKey(){
+    $.ajax({
+      async : false, // 동기, 비동기 버튼 (false하면 동기)
+      url : '/user/rsa-key',
+      type : 'GET',
+      dataType : 'json'
+    }).done(function(data) {
+      console.log('---------RSA공개키 가져오기 완료---------');
+      console.log(data);
+      $('#rsaPublicKeyModule').val(data.publicKeyModule);
+      $('#rsaPublicKeyExponent').val(data.publicKeyExponent);
+    }).fail(function(xhr, status, error) {
+      console.log(error);
+    });
+  }
+
+  function securedData() {
+    const rsaKey = new RSAKey();
+    rsaKey.setPublic($('#rsaPublicKeyModule').val(),$('#rsaPublicKeyExponent').val());
+    $('#securedUserId').val(rsaKey.encrypt($('#userId').val()));
+    $('#securedUserPassword').val(rsaKey.encrypt($('#userPassword').val()));
+  }
+
+</script>
