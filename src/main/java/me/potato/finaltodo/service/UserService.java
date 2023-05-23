@@ -11,7 +11,7 @@ import me.potato.finaltodo.store.entity.User;
 import me.potato.finaltodo.store.repository.UserRepository;
 import me.potato.finaltodo.utils.EntityDtoUtil;
 import me.potato.finaltodo.utils.Tracking;
-import me.potato.finaltodo.utils.config.ZRsaSecurity;
+import me.potato.finaltodo.utils.ZRsaSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,17 +59,15 @@ public class UserService {
             System.out.println(loginId);
             System.out.println(password);
             Optional<User> user = repository.findUsersByLoginId(loginId);
-            if(user.isPresent()) {
-                if(passwordEncoder.matches(password,user.get().getPassword())){
-                    session.setAttribute("user",user.get());
-                    return user.get();
+            return user.map(u -> {
+                if(passwordEncoder.matches(password, u.getPassword())){
+                    session.setAttribute("user",u);
+                    session.setMaxInactiveInterval(30*60);
                 }else {
                     throw new PasswordNotMatchException("10005","Password Not Match..");
-
                 }
-            }else {
-                throw new IdNotMatchException("10006","ID not Match,..");
-            }
+                return u;
+            }).orElseThrow(() -> new IdNotMatchException("10006","ID not Match.."));
         }else {
             throw new PrivateKeyNotExistException("10007","privateKey is not Exist..");
         }

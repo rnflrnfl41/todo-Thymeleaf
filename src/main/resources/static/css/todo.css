@@ -53,3 +53,90 @@
     position: absolute;
     margin-left: 300px;
 }
+
+button {
+    cursor: pointer;
+}
+
+input {
+    border-radius: 8px;
+    border: 1px solid gray;
+    font-family: "paybooc-Light", sans-serif;
+    background-color: #f7f9fa;
+    font-weight: 600;
+}
+
+.modal {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 90px;
+    top: 100px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.modal .modal-window {
+    background-color: rgba(247,250,250,0.5);
+    backdrop-filter: blur( 13.5px );
+    -webkit-backdrop-filter: blur( 13.5px );
+    border-radius: 10px;
+    border: 1px solid gray;
+    width: 400px;
+    height: 500px;
+    position: relative;
+    top: -100px;
+    padding: 10px;
+}
+.modal .title {
+    padding-left: 10px;
+    display: inline;
+    text-shadow: 1px 1px 2px gray;
+
+}
+.modal .title h2 {
+    display: inline;
+}
+
+.modal #closeModalBtn {
+    display: inline;
+    float: right;
+    cursor: pointer;
+    color: red;
+    border-radius: 5px;
+    font-family: "paybooc-Light", sans-serif;
+    background-color: lightgray;
+    border: none;
+}
+.modal #closeModalBtn:hover {
+    color: darkred;
+}
+
+.modal .content {
+    margin-top: 20px;
+    padding: 0px 10px;
+    text-shadow: 1px 1px 2px gray;
+}
+
+.w-btn {
+    display: inline-block;
+    border: 1px solid;
+    padding: 5px 10px;
+    border-radius: 15px;
+    text-decoration: none;
+    transition: 0.25s;
+    margin-left: 10px;
+}
+.w-btn-indigo {
+    background-color: #ccd0d4;
+    color: white;
+}
+.w-btn-indigo:hover {
+    color: darkseagreen;
+}

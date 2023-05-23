@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+<div>
+  <input type="hidden" id="errorMsg" name="errorMsg" th:value="로그인 후 접근 가능한 페이지 입니다.">
+</div>
+</body>
+</html>
+<script>
+
+    (function () {
+    alert($('#errorMsg').val());
+    location.href = "/user/login";
+  })();
+</script>

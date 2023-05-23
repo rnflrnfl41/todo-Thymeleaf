@@ -1,4 +1,4 @@
-package me.potato.finaltodo.utils.config;
+package me.potato.finaltodo.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

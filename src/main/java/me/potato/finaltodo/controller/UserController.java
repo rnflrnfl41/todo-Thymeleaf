@@ -7,8 +7,7 @@ import me.potato.finaltodo.controller.dtos.CreateUserRequest;
 import me.potato.finaltodo.controller.dtos.LoginRequest;
 import me.potato.finaltodo.service.UserService;
 import me.potato.finaltodo.store.entity.User;
-import me.potato.finaltodo.utils.config.ZRsaSecurity;
-import org.springframework.boot.web.servlet.server.Session;
+import me.potato.finaltodo.utils.ZRsaSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +26,11 @@ public class UserController {
     @GetMapping("/login")
     public String login(Model model) {
         return "/login";
+    }
+
+    @GetMapping("/error")
+    public String needLogin(Model model) {
+        return "/filterError";
     }
 
     @GetMapping("/join")
@@ -87,13 +91,16 @@ public class UserController {
     }
 
     @RequestMapping(value = "/proc", method = RequestMethod.POST)
-    public String loginProc(LoginRequest loginReq, HttpServletRequest httpReq, Model model)  {
-        System.out.println(loginReq);
+    public String loginProc(LoginRequest loginReq, HttpServletRequest httpReq)  {
+        String prevURL = httpReq.getHeader("referer");
+        System.out.println(prevURL);
         try {
            service.loginUser(loginReq,httpReq.getSession());
+           return "redirect:/todo/main";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return "redirect:/todo/main";
     }
+
+
 }
