@@ -1,10 +1,11 @@
 .todoForm {
     height: 60px;
     margin: 16px;
+    width: 800px;
 }
 .todoInput {
     box-sizing: border-box;
-    width: 517px;
+    width: 700px;
     height: 35px;
     padding: 10px;
     font-size: 16px;
@@ -15,12 +16,10 @@
 }
 .todoTitle {
     font-size: 32px;
-    margin-left: 16px;
-    margin-left: 250px;
+    margin-left: 300px;
 }
 .todoList {
     list-style: none;
-    margin: 16px;
     padding: 0;
 }
 
@@ -29,7 +28,7 @@
     justify-content: space-between;
     background-color: #f7f9fa;
     align-items: center;
-    width: 590px;
+    width: 850px;
     height: 45px;
     margin-bottom: 16px;
     padding: 10px;
@@ -47,11 +46,6 @@
 .button {
     width: 50px;
     margin-left: 10px;
-}
-.todo {
-    width: 670px;
-    position: absolute;
-    margin-left: 300px;
 }
 
 button {

@@ -1,15 +1,9 @@
 package me.potato.finaltodo.service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import me.potato.finaltodo.controller.dtos.CreateTodoRequest;
-import me.potato.finaltodo.service.exceptions.NoUserInfoInSessionException;
-import me.potato.finaltodo.service.exceptions.OrderingNotExistException;
-import me.potato.finaltodo.service.exceptions.TodoListNotExistException;
-import me.potato.finaltodo.service.exceptions.TodoNotExistException;
 import me.potato.finaltodo.store.entity.Ordering;
 import me.potato.finaltodo.store.entity.Todo;
-import me.potato.finaltodo.store.entity.User;
 import me.potato.finaltodo.store.repository.OrderingRepository;
 import me.potato.finaltodo.store.repository.TodoRepository;
 import me.potato.finaltodo.utils.EntityDtoUtil;
@@ -18,9 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +21,6 @@ public class TodoOrderingService {
     private final OrderingRepository orderingRepository;
     private final TodoRepository todoRepository;
 
-    public User verificationSession(HttpSession session) {
-        User user = (User)session.getAttribute("user");
-        return Optional.ofNullable(user).orElseThrow(() -> new NoUserInfoInSessionException("",""));
-    }
 
     @Tracking
     public Ordering createTodoOrdering(CreateTodoRequest request) {
@@ -58,8 +46,9 @@ public class TodoOrderingService {
     }
 
     @Tracking
-    public Ordering completeTodo(Long todoId, Long userId) {
+    public String completeTodo(Long todoId, Long userId) {
         Optional<Ordering> ordering = orderingRepository.findByUserNo(userId);
+        Map<String, String> resultMap = new HashMap<>();
         return ordering.map(o -> {
             var todoList = o.getTodoList();
             Todo todo = new Todo();
@@ -72,15 +61,16 @@ public class TodoOrderingService {
             }
             o.setTodoList(todoList);
             todoRepository.save(todo);
-            return orderingRepository.save(o);
-        }).orElseThrow(() -> new OrderingNotExistException("10003","ordering not exist,,"));
+            orderingRepository.save(o);
+            return resultMap.put("data","200");
+        }).orElse(resultMap.put("data","100"));
     }
 
     @Tracking
-    public void deleteTodo(Long todoId, Long userId) {
-        throw new TodoNotExistException("test","testException");
-        /*Optional<Ordering> ordering = orderingRepository.findByUserNo(userId);
-        ordering.map(o -> {
+    public String deleteTodo(Long todoId, Long userId) {
+        Map<String, String> resultMap = new HashMap<>();
+        Optional<Ordering> ordering = orderingRepository.findByUserNo(userId);
+       return ordering.map(o -> {
             var todoList = o.getTodoList();
             for(int i=0; i<todoList.size(); i++) {
                 var todo = todoList.get(i);
@@ -90,9 +80,9 @@ public class TodoOrderingService {
                     todoRepository.delete(todo);
                 }
             }
-            System.out.println("ordering: "+o);
-            return orderingRepository.save(o);
-        }).orElseThrow(() -> new OrderingNotExistException("10003","ordering not exist,,"));*/
+            orderingRepository.save(o);
+            return resultMap.put("result","200");
+        }).orElse(resultMap.put("result","500"));
 
     }
 
@@ -104,14 +94,5 @@ public class TodoOrderingService {
         return ordering.map(o -> o.getTodoList()).orElse(todoList);
     }
 
-    @Tracking
-    public Todo getTodo(Long id) {
-        Optional<Todo> todo = todoRepository.findById(id);
-        if(todo.isPresent()) {
-            return todo.get();
-        }else {
-            throw new TodoNotExistException("10001","Todo Not Exist..");
-        }
-    }
 
 }

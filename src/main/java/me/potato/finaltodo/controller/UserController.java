@@ -25,17 +25,17 @@ public class UserController {
 
     @GetMapping("/login")
     public String login(Model model) {
-        return "/login";
+        return "login/login";
     }
 
     @GetMapping("/error")
     public String needLogin(Model model) {
-        return "/filterError";
+        return "login/noSessionError";
     }
 
     @GetMapping("/join")
     public String join(Model model) {
-        return "/join";
+        return "login/join";
     }
 
     @GetMapping("/duplicate")
@@ -92,14 +92,18 @@ public class UserController {
 
     @RequestMapping(value = "/proc", method = RequestMethod.POST)
     public String loginProc(LoginRequest loginReq, HttpServletRequest httpReq)  {
-        String prevURL = httpReq.getHeader("referer");
-        System.out.println(prevURL);
         try {
            service.loginUser(loginReq,httpReq.getSession());
            return "redirect:/todo/main";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @ResponseBody
+    public void logout(HttpSession session) {
+        service.logout(session);
     }
 
 

@@ -1,24 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:c="http://www.w3.org/1999/XSL/Transform"
-      xmlns:u="http://www.w3.org/1999/XSL/Transform">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/mainLayout}">
 <head>
     <meta charset="UTF-8">
     <title>Todo</title>
-    <link href="/css/todo.css" rel="stylesheet">
-    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <style>
+        .todo {
+            width: 1000px;
+            position: absolute;
+            margin: 50px;
+            left: 650px;
+        }
+        .todoText {
+            width: 500px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+    </style>
 </head>
 <body>
+<th:block layout:fragment="content">
     <div class="todo">
-        <h3 class="todoTitle">오늘의 할일</h3>
+        <h3 class="todoTitle">Todo List</h3>
         <form class="todoForm">
             <input type="hidden" id="userNo" th:value="${userNo}">
+            <input type="hidden" id="exception" th:value="${exMessage}">
             <input class="todoInput" id="todoInput" type="text"/>
             <button class="w-btn w-btn-indigo" onclick="addTodo();">저장</button>
         </form>
         <div id="todoList">
             <ul class="todoList">
                 <li class="todoItem" th:id="'item'+${todoList.id}" th:each="todoList : ${todoList}">
-                    <p class="todoText" th:id="'text'+${todoList.id}" th:text="${todoList.item}" th:style="${todoList.status == 'completed' ? 'text-decoration: line-through;' : ''}"/>
+                    <p class="todoText" th:id="'text'+${todoList.id}" th:text="${todoList.item}"  th:style="${todoList.status == 'completed' ? 'text-decoration: line-through;' : ''}"/>
                     <div>
                         <button th:if="${todoList.status != 'completed'}" th:id="'complete'+${todoList.id}" class="w-btn w-btn-indigo" th:onclick="completeTodo([[${todoList.id}]]);">완료</button>
                         <button class="w-btn w-btn-indigo" th:onclick="deleteTodo([[${todoList.id}]]);">삭제</button>
@@ -47,5 +63,24 @@
             </ul>
         </div>
     </div>
+</th:block>
 </body>
+<script>
+    (function() {
+        if($('#exception').val() != ''){
+            console.log($('#exception').val());
+        }
+    })();
+</script>
 </html>
+<script>
+    function logout(){
+        $.ajax({
+            url: "/user/logout",
+            type: "post"
+        }).done(function() {
+            alert("로그아웃 되었습니다.");
+            location.href = "/user/login";
+        });
+    }
+</script>

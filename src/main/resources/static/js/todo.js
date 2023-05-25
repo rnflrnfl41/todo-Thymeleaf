@@ -16,10 +16,14 @@ function completeTodo(num) {
             "todoNum" : num
         }, })
         .done(
-            function() {
-                document.getElementById('complete' + num).style.display = 'none';
-                document.getElementById('text' + num).style.textDecoration = 'line-through';
-                $("#todoList").load(location.href+" #todoList");
+            function(result) {
+                if(result=="200"){
+                    document.getElementById('complete' + num).style.display = 'none';
+                    document.getElementById('text' + num).style.textDecoration = 'line-through';
+                    $("#todoList").load(location.href+" #todoList");
+                }else {
+                    alert("완료 실패. 로그를 참조하시오.");
+                }
             });
 
 }
@@ -29,17 +33,18 @@ function deleteTodo(num) {
     $.ajax ({
         url: '/todo/delete',
         type: 'GET',
-        async: false,
         data: {
             "userNo" : userNo,
             "todoNum" : num
         }, })
         .done(
-            function() {
-                document.getElementById('item' + num).style.display = 'none';
-            }).fail(function () {
-        alert("can not delete error");
-    });
+            function(result) {
+                if(result=="200"){
+                    document.getElementById('item' + num).style.display = 'none';
+                }else {
+                    alert("삭제 실패. 로그를 참조하시오.");
+                }
+            });
 }
 
 function addTodo() {
@@ -56,8 +61,5 @@ function addTodo() {
     }).done(
         function() {
             $("#todoList").load(location.href+" #todoList");
-        }).fail(
-        function (resultMap) {
-            alert(resultMap.msg);
         });
 }

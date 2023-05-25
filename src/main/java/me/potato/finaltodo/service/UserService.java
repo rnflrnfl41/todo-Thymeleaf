@@ -4,12 +4,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import me.potato.finaltodo.controller.dtos.CreateUserRequest;
 import me.potato.finaltodo.controller.dtos.LoginRequest;
-import me.potato.finaltodo.service.exceptions.IdNotMatchException;
-import me.potato.finaltodo.service.exceptions.PasswordNotMatchException;
-import me.potato.finaltodo.service.exceptions.PrivateKeyNotExistException;
+import me.potato.finaltodo.service.exceptions.LoginException;
 import me.potato.finaltodo.store.entity.User;
 import me.potato.finaltodo.store.repository.UserRepository;
 import me.potato.finaltodo.utils.EntityDtoUtil;
+import me.potato.finaltodo.utils.LoginCheck;
 import me.potato.finaltodo.utils.Tracking;
 import me.potato.finaltodo.utils.ZRsaSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +26,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Tracking
+    @LoginCheck
     public User insertUser(CreateUserRequest request) {
         var user = EntityDtoUtil.userRtoE(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -48,7 +47,7 @@ public class UserService {
         return result;
     }
 
-    @Tracking
+    @LoginCheck
     public User loginUser(LoginRequest request,HttpSession session) throws Exception {
         ZRsaSecurity security = new ZRsaSecurity();
         PrivateKey privateKey = (PrivateKey)session.getAttribute("_rsaPrivateKey_");
@@ -59,19 +58,24 @@ public class UserService {
             System.out.println(loginId);
             System.out.println(password);
             Optional<User> user = repository.findUsersByLoginId(loginId);
+
             return user.map(u -> {
                 if(passwordEncoder.matches(password, u.getPassword())){
                     session.setAttribute("user",u);
                     session.setMaxInactiveInterval(30*60);
                 }else {
-                    throw new PasswordNotMatchException("10005","Password Not Match..");
+                    throw new LoginException("10005","패스워드가 일치하지 않습니다.");
                 }
                 return u;
-            }).orElseThrow(() -> new IdNotMatchException("10006","ID not Match.."));
+            }).orElseThrow(() -> new LoginException("10006","아이디가 일치하지 않습니다."));
         }else {
-            throw new PrivateKeyNotExistException("10007","privateKey is not Exist..");
+            throw new LoginException("10007","privateKey is not Exist..");
         }
 
+    }
+
+    public void logout(HttpSession session) {
+        session.removeAttribute("user");
     }
 
 }
