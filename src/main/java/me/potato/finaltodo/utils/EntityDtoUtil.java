@@ -33,7 +33,4 @@ public class EntityDtoUtil {
         return user;
     }
 
-    public static ErrorResponse toErrorDto(CommonException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
-    }
 }

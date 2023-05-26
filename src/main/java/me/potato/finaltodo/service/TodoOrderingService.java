@@ -7,7 +7,7 @@ import me.potato.finaltodo.store.entity.Todo;
 import me.potato.finaltodo.store.repository.OrderingRepository;
 import me.potato.finaltodo.store.repository.TodoRepository;
 import me.potato.finaltodo.utils.EntityDtoUtil;
-import me.potato.finaltodo.utils.Tracking;
+import me.potato.finaltodo.utils.aspect.Tracking;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

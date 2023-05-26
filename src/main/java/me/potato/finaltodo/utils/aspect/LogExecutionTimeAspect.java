@@ -1,4 +1,4 @@
-package me.potato.finaltodo.utils;
+package me.potato.finaltodo.utils.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import me.potato.finaltodo.service.exceptions.LoginException;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 public class LogExecutionTimeAspect {
 
 
-    @Around("@annotation(me.potato.finaltodo.utils.Tracking)")
+    @Around("@annotation(me.potato.finaltodo.utils.aspect.Tracking)")
     public Object logExecutionByAnnotation(ProceedingJoinPoint pjp) throws Throwable {
         return tracking(pjp);
     }
 
-    @Around("@annotation(me.potato.finaltodo.utils.LoginCheck)")
+    @Around("@annotation(me.potato.finaltodo.utils.aspect.LoginCheck)")
     public Object loginCheckByAnnotation(ProceedingJoinPoint pjp) throws Throwable {
         return loginCheck(pjp);
     }

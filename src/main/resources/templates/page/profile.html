@@ -1,30 +1,39 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/main_layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/mainLayout}">
 
 <head>
     <meta charset="utf-8" />
     <title>profile</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/profile/profile.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/profile/modal.css}">
-    <script th:src="@{/plugins/jquery/jquery.min.js}"></script>
-    <script th:src="@{/plugins/bootstrap/js/bootstrap.min.js}"></script>
-
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <style>
+        #makePost {
+            font-family: 'nsM';
+            background-color: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-left: 30px;
+            padding: 5px 9px;
+            outline: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <div layout:fragment="content">
     <div class="header-line"></div>
-    <div class="content">
+    <div class="content" style="position: absolute; left: 500px;">
         <div class="container">
             <div class="user-profile">
-                <img th:src="${profileVO.storedFileName}"/>
-                <input type="hidden" id="name" th:value="${profileVO.storedFileName}">
+                <img th:src="'/image/'+${profile.storedFileName}"/>
+                <input type="hidden" id="name" th:value="${profile.storedFileName}">
                 <div class="main_profile" style="width:603px; height:162px;">
                     <div class="user-id" style="width:603px; height:48px;">
-                        <p style="height:37px; margin-bottom: 0" th:text="${profileVO.userId}"></p>
+                        <p style="height:37px; margin-bottom: 0" th:text="${profile.userLoginId}"></p>
                         <button class="edit" id="setProfile" onclick="location.href='/profile/profileFix'"
                         style="width:93px; height:30px; font-size:revert">프로필 편집</button>
-                        <div class="preference">
+                        <div class="preference" style="margin-left: 30px;">
                             <!-- prettier-ignore -->
                             <svg viewBox="0 0 48 48" onclick="location.href='/profile/infoFix'">
                                 <path clip-rule="evenodd"
@@ -36,22 +45,25 @@
                     <div class="count" style="width:603px; height:22px;">
                         <div class="post" style="border-bottom: 0; color:black; margin-bottom:0; padding-bottom:0;">
                             <a>게시물&nbsp;</a>
-                            <span th:text="${profileVO.contentCount}"></span>
+                            <span th:text="${profile.contentCount}"></span>
                         </div>
                         <div class="follower">
                             <a>친구&nbsp;</a>
-                            <span th:text="${profileVO.friendCount}"></span>
+                            <span th:text="${profile.friendCount}"></span>
                         </div>
                     </div>
                     <div class="introduce">
-                        <h1 style="margin-bottom: 0; font-weight:1000; line-height:2" th:text="${profileVO.userName}"></h1>
-                        <span th:text="${profileVO.profileIntro}"><br />
+                        <h1 style="margin-bottom: 0; font-weight:1000; line-height:2" th:text="${profile.userName}"></h1>
+                        <span th:text="${profile.profileIntro}"><br />
                         </span>
+                    </div>
+                    <div>
+                        <button class="edit" id="makePost" onclick="" style="width:93px; height:30px; font-size:revert; float: right">post 만들기</button>
                     </div>
                 </div>
             </div>
             <div class="tag">
-                <div id="btn-posts" class="btn active">
+                <div id="btn-posts" class="btn active" style="border: none">
                     <!-- prettier-ignore -->
                     <svg viewBox="0 0 48 48">
                         <path
@@ -70,7 +82,7 @@
     <!-- 포스트 모달 -->
     <div class="modal-post" id="post_modal" style="z-index: 10000;">
         <!-- prettier-ignore -->
-        <svg class="post-close" fill="#ffffff" viewBox="0 0 48 48" onclick="$('#post_modal').modal('hide');"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
+        <svg class="post-close" fill="#ffffff" viewBox="0 0 48 48" onclick="hidePost();"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
         <div class="wrapper" style="width:870px;min-height: 600px">
             <div class="image" style="min-width:600px;">
                 <img id="post-main" style="width:600px;" th:src="@{/images/logo.png}" />
@@ -126,7 +138,10 @@
     <script>
 
         function getPost() {
-            $('#post_modal').modal('show');
+            document.getElementById('post_modal').style.display = "flex";
+        }
+        function hidePost() {
+            document.getElementById('post_modal').style.display = "none";
         }
 
         //post 좋아요 버튼
