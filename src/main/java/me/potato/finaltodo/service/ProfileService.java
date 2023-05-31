@@ -13,17 +13,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProfileService {
 
-    private final UserProfileRepository repository;
+    private final UserProfileRepository profileRepository;
 
     public UserProfile getProfile(HttpSession session) {
         User user = (User)session.getAttribute("user");
-        Optional<UserProfile> profileVO = repository.findByUserNum(user.getId());
+        Optional<UserProfile> profileVO = profileRepository.findByUserNum(user.getId());
         return profileVO.orElseGet(() -> {
             UserProfile newProfile = new UserProfile();
             newProfile.setUserNum(user.getId());
             newProfile.setUserLoginId(user.getLoginId());
             newProfile.setUserName(user.getName());
-            return repository.save(newProfile);
+            return profileRepository.save(newProfile);
         });
     }
 }

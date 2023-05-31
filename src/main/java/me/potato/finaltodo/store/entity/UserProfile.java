@@ -1,10 +1,7 @@
 package me.potato.finaltodo.store.entity;
 
 import groovyjarjarantlr4.v4.runtime.misc.NotNull;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
@@ -26,18 +23,22 @@ public class UserProfile {
     @NotNull
     private String userName;
 
-    @ColumnDefault("' '")
     private String profileIntro;
 
-    @ColumnDefault("0")
     private Long contentCount;
 
-    @ColumnDefault("0")
     private Long friendCount;
 
-    @ColumnDefault("'default'")
     private String originalFileName;
 
-    @ColumnDefault("'default'")
     private String storedFileName;
+
+    @PrePersist
+    public void prePersist(){
+        this.storedFileName = this.storedFileName == null ? "default" : this.storedFileName;
+        this.originalFileName = this.originalFileName == null ? "default" : this.originalFileName;
+        this.friendCount = this.friendCount == null ? 0 : this.friendCount;
+        this.contentCount = this.contentCount == null ? 0 : this.contentCount;
+        this.profileIntro = this.profileIntro == null ? "프로필 소개란" : this.profileIntro;
+    }
 }

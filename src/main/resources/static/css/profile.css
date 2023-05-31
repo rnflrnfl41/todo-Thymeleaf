@@ -560,7 +560,7 @@ div.setting div.wrapper button:focus {
 div.setting div.wrapper button:nth-child(1) {
   border-top: none; }
 
-.posts img:hover {
+.posts .postImg:hover {
   opacity: .5;
 }
 

@@ -19,8 +19,6 @@ div.modal-post {
   div.modal-post > div.wrapper {
     display: flex;
     position: relative;
-    margin-top: 3%;
-    margin-left: 15%;
     width: 870px;
     height: 600px;
     background-color: #ffffff;
@@ -561,8 +559,6 @@ div.modal-direct {
           margin-left: 4px; }
         div.modal-direct div.wrapper div.frame button:focus {
           outline: none; }
-        div.modal-direct div.wrapper div.frame button:hover {
-          background-color: #fcf9f9; }
         div.modal-direct div.wrapper div.frame button:nth-child(1) {
           border-top: none; }
         div.modal-direct div.wrapper div.frame button:nth-child(7) {

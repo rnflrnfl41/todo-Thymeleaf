@@ -3,8 +3,6 @@ package me.potato.finaltodo.store.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import me.potato.finaltodo.store.converter.CommentArrayConverter;
-import me.potato.finaltodo.store.converter.TodoArrayConverter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -17,11 +15,13 @@ public class UserPost {
     @GeneratedValue
     private Long id;
 
+    private Long userNum;
+
     private String postContent;
 
     @Column(columnDefinition = "json")
     @Convert(converter = CommentArrayConverter.class)
-    private List<Comment> comment;
+    private List<Comment> commentList;
 
     private Long likeCount;
 
@@ -30,6 +30,13 @@ public class UserPost {
     private String originalFileName;
 
     private String storedFileName;
+
+    @PrePersist
+    public void prePersist(){
+        this.likeCount = this.likeCount == null ? 0 : this.likeCount;
+    }
+
+
 
 
 

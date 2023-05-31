@@ -18,6 +18,75 @@
             outline: none;
             cursor: pointer;
         }
+        #makeCloseBtn {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            top: 18px;
+            right: 18px;
+            cursor: pointer;
+        }
+        .btn-upload {
+            width: 200px;
+            height: 40px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+           &:hover {
+            background: #0a58ca;
+           }
+        }
+        #multipartFile {
+            display: none;
+        }
+        .user {
+            display: flex;
+            width: 100%;
+            height: 72px;
+            border-bottom: 1px #dbdbdb solid;
+            flex-direction: row;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px 20px;
+        }
+        .user img {
+            width: 45px;
+            height: 45px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .user a {
+            font-size: 15px;
+            font-family: 'nsM';
+            padding: 0px 0px 0px 14px;
+            cursor: pointer;
+        }
+        #content {
+            outline: none;
+            resize: none;
+            width: 100%;
+            height: 100%;
+            font-size: 22px;
+            border: none
+        }
+        #content:focus {
+            border: none;
+        }
+        #deleteJpg {
+            position: absolute;
+            display: none;
+            width: 24px;
+            height: 24px;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -58,7 +127,7 @@
                         </span>
                     </div>
                     <div>
-                        <button class="edit" id="makePost" onclick="" style="width:93px; height:30px; font-size:revert; float: right">post 만들기</button>
+                        <button class="edit" id="makePost" onclick="getMake();" style="width:93px; height:30px; font-size:revert; float: right">post 만들기</button>
                     </div>
                 </div>
             </div>
@@ -74,80 +143,165 @@
                 </div>
             </div>
             <div class="posts">
-                <img th:src="@{/images/logo.png}" style="width: 280px; height: 280px; cursor: pointer" onclick="getPost()">
+                <tr th:each="post : ${posts}">
+                    <img class="postImg" th:src="'/image/'+${post.storedFileName}" style="width: 280px; height: 280px; cursor: pointer" th:onclick="getPost([[${post.id}]]);">
+                    <div class="modal-post" th:id="post_modal+${post.id}" style="z-index: 10000;">
+                        <!-- prettier-ignore -->
+                        <input type="hidden" id="postId" th:value="${post.id}">
+                        <svg class="post-close" fill="#ffffff" viewBox="0 0 48 48" th:onclick="hidePost([[${post.id}]]);"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
+                        <div class="wrapper" style="width:870px;min-height: 600px">
+                            <div class="image" style="min-width:600px;">
+                                <img id="post-main" style="width:600px;" th:src="'/image/'+${post.storedFileName}" />
+                                <div class="heart-wrapper">
+                                    <div class="heart"></div>
+                                </div>
+                            </div>
+                            <div class="post-content" style="width:270px">
+                                <div class="user">
+                                    <img th:src="'/image/'+${profile.storedFileName}">
+                                    <a onclick="location.href='/profile/home'" th:text="${profile.userName}"></a>
+                                    <span>ㆍ</span>
+                                    <div class="blank"></div>
+                                </div>
+                                <div class="rest">
+                                    <div class="text" style="height:370.4px;">
+                                        <div class="top" style="height:53.2px">
+                                            <div class="posting">
+                                                <p class="time"></p>
+                                                <span class="content-wrapper" style="background-color: #ffffff;margin-left:0" th:text="${post.postContent}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="comment-container">
+                                            <div class="posting" id="posting">
+                                                <div th:each="commentList : ${post.commentList}">
+                                                    <a class="id" th:text="${commentList.userLoginId}" style="font-size: 15px;text-decoration: none;color: black;"/>
+                                                    <p class="comment" th:text="${commentList.comment}" style="display: inline-block;margin-left: 5px;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="buttons" id="buttons">
+                                        <button class="like" style="border:0">
+                                            <svg class="like-no" id="like-no" viewBox="0 0 48 48">
+                                                <path
+                                                        d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"
+                                                ></path>
+                                            </svg>
+                                            <svg class="like-yes" id="like-yes" viewBox="0 0 48 48"><path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path></svg>
+                                        </button>
+                                    </div>
+                                    <div id="like">
+                                        <button class="likes-count" style="font-size:revert; border:0" th:text="'좋아요 '+${post.likeCount}+'개'"></button>
+                                    </div>
+                                    <div class="post-date" th:text="${post.postingDate}"></div>
+                                    <div class="comment-wrapper">
+                                        <textarea id="comment" style="border:0" onkeyup="comment()"placeholder="댓글 달기..."></textarea>
+                                        <button style="border:0" class="submit" onclick="sendComment();">게시</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tr>
             </div>
         </div>
     </div>
 
     <!-- 포스트 모달 -->
-    <div class="modal-post" id="post_modal" style="z-index: 10000;">
-        <!-- prettier-ignore -->
-        <svg class="post-close" fill="#ffffff" viewBox="0 0 48 48" onclick="hidePost();"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
-        <div class="wrapper" style="width:870px;min-height: 600px">
-            <div class="image" style="min-width:600px;">
-                <img id="post-main" style="width:600px;" th:src="@{/images/logo.png}" />
-                <div class="heart-wrapper">
-                    <div class="heart"></div>
+    <div class="modal" id="makingModal" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.65)">
+        <svg id="makeCloseBtn" fill="#ffffff" viewBox="0 0 48 48" onclick="hideMake();"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="width: 1600px;height: 800px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" style="margin-left: 400px">새 게시물 만들기</h3>
+                    <button type="button" class="btn btn-primary" onclick="sendFrm();">공유</button>
                 </div>
-            </div>
-            <div class="post-content" style="width:270px">
-                <div class="user">
-                    <img th:src="@{/images/logo.png}">
-                    <a onclick="location.href='/profile/home'">Korea_IT_Academy</a>
-                    <span>ㆍ</span>
-                    <div class="blank"></div>
-                </div>
-                <div class="rest">
-                    <div class="text" style="height:370.4px;">
-                        <div class="top" style="height:53.2px">
-                            <div class="posting">
-                                <p class="time"></p>
-                                <span class="content-wrapper" style="background-color: #ffffff;margin-left:0">여기가 포스트 컨텐츠 (글쓰기 란)</span>
+                <div class="modal-body" style="padding: 0px">
+                    <form id="makingFrm" style="width: 100%; height: 100%">
+                        <div id="imageContainer" style="float: left; width: 70%;height: 100%; border-right: var(--bs-modal-header-border-width) solid var(--bs-modal-header-border-color); display: grid">
+                            <svg id="deleteJpg" fill="#ff0000" viewBox="0 0 48 48" onclick="removeImg();"><path clip-rule="evenodd" d="M41.8 9.8L27.5 24l14.2 14.2c.6.6.6 1.5 0 2.1l-1.4 1.4c-.6.6-1.5.6-2.1 0L24 27.5 9.8 41.8c-.6.6-1.5.6-2.1 0l-1.4-1.4c-.6-.6-.6-1.5 0-2.1L20.5 24 6.2 9.8c-.6-.6-.6-1.5 0-2.1l1.4-1.4c.6-.6 1.5-.6 2.1 0L24 20.5 38.3 6.2c.6-.6 1.5-.6 2.1 0l1.4 1.4c.6.6.6 1.6 0 2.2z" fill-rule="evenodd"></path></svg>
+                            <label class="btn-upload" id="getFile" style="align-self: center">컴퓨터에서 사진 선택</label>
+                            <input type="file" id="multipartFile" onchange="setThumbnail(event);" />
+                        </div>
+                        <div style="float: right; width: 30%;height: 100%;">
+                            <div class="user">
+                                <img th:src="'/image/'+${profile.storedFileName}"/>
+                                <a onclick="location.href='/profile/home'" th:text="${profile.userLoginId}"></a>
+                                <span>ㆍ</span>
+                                <div class="blank"></div>
+                            </div>
+                            <div class="text-content" style="width: 97%; height: 80%; margin: 10px 0px 0px 5px; padding: 0px 12px 0px 12px;">
+                                <textarea  id="content" placeholder="문구 입력.."></textarea>
                             </div>
                         </div>
-                        <div class="comment-container">
-                            <img th:src="@{/images/logo.png}">
-                            <div class="posting">
-                                <div>
-                                    <p class="comment"><a class="id">아이디</a>댓글</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="buttons">
-                        <button class="like" style="border:0">
-                            <svg class="like-no" id="like-no" viewBox="0 0 48 48">
-                                <path
-                                        d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"
-                                ></path>
-                            </svg>
-                            <svg class="like-yes" id="like-yes" viewBox="0 0 48 48"><path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path></svg>
-                        </button>
-                    </div>
-                    <button class="likes-count" style="font-size:revert; border:0">좋아요 1,351개</button>
-                    <div class="post-date">2020년 6월 19일</div>
-                    <div class="comment-wrapper">
-                        <textarea style="border:0" onkeyup="comment()"placeholder="댓글 달기..."></textarea>
-                        <button style="border:0" class="submit">게시</button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+
     <script>
 
-        function getPost() {
-            document.getElementById('post_modal').style.display = "flex";
+
+        function removeImg() {
+            $('#viewImg').remove();
+            document.getElementById('getFile').style.display = "flex";
+            document.getElementById('deleteJpg').style.display = "none";
         }
-        function hidePost() {
-            document.getElementById('post_modal').style.display = "none";
+
+        function setThumbnail(event) {
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                var img = document.createElement("img");
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.setAttribute("id","viewImg");
+                img.setAttribute("src", event.target.result);
+                document.querySelector("div#imageContainer").appendChild(img);
+            };
+            document.getElementById('getFile').style.display = "none"
+            document.getElementById('deleteJpg').style.display = "flex";
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.querySelector('label.btn-upload').addEventListener('click', function (e) {
+            $('#multipartFile').click();
+        });
+
+        function getMake() {
+            document.getElementById('makingModal').style.display = "flex";
+        }
+
+        function hideMake() {
+            document.getElementById('makingModal').style.display = "none";
+        }
+
+        function getPost(num) {
+            document.getElementById('post_modal' + num).style.display = "flex";
+        }
+        function hidePost(num) {
+            document.getElementById('post_modal' +num).style.display = "none";
         }
 
         //post 좋아요 버튼
         document.querySelector('svg.like-no').addEventListener('click', function (e) {
             document.querySelector('svg.like-no').style.display = 'none';
             document.querySelector('svg.like-yes').style.display = 'flex';
+            var postId = $('#postId').val();
+            $.ajax({
+                url: '/post/likeYes',
+                type: 'get',
+                data: {
+                    "postId" : postId
+                }
+            }).done(function () {
+                $("#like").load(location.href+" #like");
+
+            }).fail(function (error) {
+                alert(error);
+            })
         });
 
         // post 좋아요취소 버튼
@@ -163,6 +317,58 @@
             } else {
                 document.querySelector('button.submit').style.opacity = '0.3';
             }
+        }
+
+        function sendFrm() {
+
+            const file = $("#multipartFile")[0];
+            console.log("multipartFile: ", file.files);
+            const formData = new FormData();
+            formData.append("multipartFile", file.files[0]);
+            formData.append("content",$("#content").val());
+
+            $.ajax({
+                url: '/post/insert',
+                type: 'post',
+                data: formData,
+                dataType: 'json',
+                enctype : 'multipart/form-data',
+                contentType: false, //전송되는 문서의 양식(false면 enctype으로 데이터가 날아감)
+                processData: false, //ajax 넘길 때 전송되는 데이터 파라메터(별도의 데이터 x)
+            }).done(function(data){
+
+                if(data.resultCode === 200) {
+                    alert('게시글 등록 완료.');
+                    location.href = "/profile/home";
+                }else {
+                    alert('게시글 등록 실패.');
+                }
+
+
+            }).fail(function (xhr, error, status){
+                console.log(error);
+            });
+        }
+
+        function sendComment() {
+            var postId = $('#postId').val();
+            var comment = $('#comment').val();
+            if(comment == '') {
+                alert("댓글을 작성해 주세요");
+                return;
+            }
+            var param = {"comment" : comment, "postId" : postId}
+            $.ajax({
+                url: '/post/comment',
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json;charset=UTF-8",
+                data:JSON.stringify(param)
+            }).done( function() {
+                $("#posting").load(location.href+" #posting");
+            }).fail(function (error) {
+                alert(error);
+            })
         }
 
 

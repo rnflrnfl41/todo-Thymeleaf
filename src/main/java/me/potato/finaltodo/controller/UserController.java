@@ -66,7 +66,7 @@ public class UserController {
     @GetMapping("/rsa-key")
     @ResponseBody
     //세션에 RSAPrivateKey를 저장 publicKeyModule,publicKeyExponent를 map에 담아 view에 전송
-    public Map<String, Object> getRSAKey(HttpServletRequest request) throws Exception {
+    public Map<String, Object> getRSAKey(HttpServletRequest request){
         Map<String, Object> resultMap = new HashMap<>();
         try {
             ZRsaSecurity security = new ZRsaSecurity();
